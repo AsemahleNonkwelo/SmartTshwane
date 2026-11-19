@@ -1,0 +1,13 @@
+using System.Security.Claims;using System.Security.Cryptography;using Microsoft.AspNetCore.Authentication;using Microsoft.AspNetCore.Authentication.Cookies;using Microsoft.AspNetCore.Authorization;using Microsoft.AspNetCore.Mvc;using Microsoft.EntityFrameworkCore;using SmartTshwane.Data;using SmartTshwane.Models;
+namespace SmartTshwane.Controllers;
+public class AccountController(AppDb db):Controller{
+[HttpGet] public IActionResult Register()=>View(new RegisterInput());
+[HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> Register(RegisterInput input){if(!ModelState.IsValid)return View(input);var email=input.Email.Trim().ToLowerInvariant();if(await db.Users.AnyAsync(x=>x.Email==email)){ModelState.AddModelError("Email","Email is already registered.");return View(input);}var user=new User{FullName=input.FullName.Trim(),Email=email,PhoneNumber=input.PhoneNumber.Trim(),PasswordHash=Hash(input.Password)};db.Users.Add(user);await db.SaveChangesAsync();await SignIn(user);return RedirectToAction("Index","Requests");}
+[HttpGet] public IActionResult Login()=>View(new LoginInput());
+[HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> Login(LoginInput input){if(!ModelState.IsValid)return View(input);var user=await db.Users.FirstOrDefaultAsync(x=>x.Email==input.Email.Trim().ToLowerInvariant());if(user==null||!Verify(input.Password,user.PasswordHash)){ModelState.AddModelError("","Invalid email or password.");return View(input);}await SignIn(user);return RedirectToAction("Index","Requests");}
+[Authorize,HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> Logout(){await HttpContext.SignOutAsync();return RedirectToAction("Index","Home");}
+public IActionResult Denied()=>View();
+private async Task SignIn(User u){var claims=new[]{new Claim(ClaimTypes.NameIdentifier,u.Id.ToString()),new Claim(ClaimTypes.Name,u.FullName),new Claim(ClaimTypes.Role,u.Role)};await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,new ClaimsPrincipal(new ClaimsIdentity(claims,CookieAuthenticationDefaults.AuthenticationScheme)));}
+private static string Hash(string password){var salt=RandomNumberGenerator.GetBytes(16);var hash=Rfc2898DeriveBytes.Pbkdf2(password,salt,210000,HashAlgorithmName.SHA256,32);return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";}
+private static bool Verify(string password,string stored){try{var p=stored.Split(':');var salt=Convert.FromBase64String(p[0]);var expected=Convert.FromBase64String(p[1]);var actual=Rfc2898DeriveBytes.Pbkdf2(password,salt,210000,HashAlgorithmName.SHA256,32);return CryptographicOperations.FixedTimeEquals(expected,actual);}catch{return false;}}
+}

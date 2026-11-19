@@ -1,0 +1,40 @@
+@model List<Notification>
+
+@{
+    ViewData["Title"] = "My Notifications";
+}
+
+<div class="container mt-4">
+    <h1>My notifications</h1>
+
+    @if (!Model.Any())
+    {
+        <p>No notifications yet.</p>
+    }
+    else
+    {
+        @foreach (var n in Model)
+        {
+            <div class="card p-3 mb-3">
+                <p>@n.Message</p>
+
+                <small>
+                    @n.CreatedUtc.ToString("dd MMM yyyy HH:mm") UTC
+                </small>
+
+                @if (!n.IsRead)
+                {
+                    <form method="post" asp-action="Read">
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" name="id" value="@n.Id" />
+
+                        <button type="submit" class="button">
+                            Mark as read
+                        </button>
+                    </form>
+                }
+            </div>
+        }
+    }
+</div>

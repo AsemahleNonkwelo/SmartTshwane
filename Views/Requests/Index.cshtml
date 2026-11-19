@@ -1,0 +1,2 @@
+@model List<ServiceRequest>
+<div class="heading"><h1>My service reports</h1><a class="button" asp-action="Create">+ New report</a></div>@if(Model.Count==0){<div class="card">You have not submitted any reports yet.</div>}@foreach(var r in Model){<div class="card"><div class="heading"><h2>@r.Title</h2><span class="status">@r.Status</span></div><p><strong>#TSH-@r.Id</strong> · @r.Category?.Name · @r.Location</p><p>Submitted @r.CreatedUtc.ToString("dd MMM yyyy HH:mm") UTC</p><a asp-action="Details" asp-route-id="@r.Id">View details →</a></div>}

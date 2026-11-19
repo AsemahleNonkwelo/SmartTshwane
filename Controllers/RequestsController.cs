@@ -1,0 +1,9 @@
+using System.Security.Claims;using Microsoft.AspNetCore.Authorization;using Microsoft.AspNetCore.Mvc;using Microsoft.AspNetCore.Mvc.Rendering;using Microsoft.EntityFrameworkCore;using SmartTshwane.Data;using SmartTshwane.Models;
+namespace SmartTshwane.Controllers;
+[Authorize] public class RequestsController(AppDb db):Controller{
+public async Task<IActionResult> Index(){int uid=int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);return View(await db.Requests.Include(x=>x.Category).Where(x=>x.UserId==uid).OrderByDescending(x=>x.CreatedUtc).ToListAsync());}
+[HttpGet] public async Task<IActionResult> Create(){await Categories();return View(new ServiceRequest());}
+[HttpPost,ValidateAntiForgeryToken] public async Task<IActionResult> Create([Bind("Title,Description,Location,CategoryId,Latitude,Longitude")]ServiceRequest item){ModelState.Remove("User");ModelState.Remove("Category");if(item.Latitude.HasValue != item.Longitude.HasValue)ModelState.AddModelError("Latitude","Provide both GPS coordinates or leave both blank.");if(!await db.Categories.AnyAsync(x=>x.Id==item.CategoryId))ModelState.AddModelError("CategoryId","Select a category.");if(!ModelState.IsValid){await Categories();return View(item);}item.UserId=int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);item.Status="Pending";item.CreatedUtc=DateTime.UtcNow;db.Requests.Add(item);await db.SaveChangesAsync();TempData["Message"]=$"Report submitted. Reference #TSH-{item.Id}";return RedirectToAction("Index");}
+public async Task<IActionResult> Details(int id){var r=await db.Requests.Include(x=>x.Category).FirstOrDefaultAsync(x=>x.Id==id);if(r==null)return NotFound();if(!User.IsInRole("Admin")&&r.UserId.ToString()!=User.FindFirstValue(ClaimTypes.NameIdentifier))return Forbid();return View(r);}
+private async Task Categories()=>ViewBag.Categories=new SelectList(await db.Categories.OrderBy(x=>x.Name).ToListAsync(),"Id","Name");
+}

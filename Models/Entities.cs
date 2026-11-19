@@ -1,0 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+namespace SmartTshwane.Models;
+public class User { public int Id {get;set;} [Required] public string FullName {get;set;}=""; [Required,EmailAddress] public string Email {get;set;}=""; [Phone] public string? PhoneNumber {get;set;} public string PasswordHash {get;set;}=""; public string Role {get;set;}="Citizen"; public List<ServiceRequest> Requests {get;set;}=new(); }
+public class Department {public int Id {get;set;} public string Name {get;set;}="";}
+public class Category {public int Id {get;set;} public string Name {get;set;}=""; public int? DepartmentId {get;set;} public Department? Department {get;set;}}
+public class Notification {public int Id {get;set;} public int UserId {get;set;} public string Message {get;set;}=""; public bool IsRead {get;set;} public DateTime CreatedUtc {get;set;}=DateTime.UtcNow;}
+public class ServiceRequest {public int Id {get;set;} [Required,StringLength(120)] public string Title {get;set;}=""; [Required,StringLength(2000)] public string Description {get;set;}=""; [Required,StringLength(200)] public string Location {get;set;}=""; public int CategoryId {get;set;} public Category? Category {get;set;} public int UserId {get;set;} public User? User {get;set;} [Range(-90,90)] public double? Latitude {get;set;} [Range(-180,180)] public double? Longitude {get;set;} public string Status {get;set;}="Pending"; public DateTime CreatedUtc {get;set;}=DateTime.UtcNow; public string? AdminNote {get;set;} }
+public class RegisterInput { [Required,StringLength(100)] public string FullName {get;set;}=""; [Required,Phone,StringLength(25)] public string PhoneNumber {get;set;}=""; [Required,EmailAddress] public string Email {get;set;}=""; [Required,MinLength(8),DataType(DataType.Password)] public string Password {get;set;}=""; }
+public class LoginInput { [Required,EmailAddress] public string Email {get;set;}=""; [Required] public string Password {get;set;}=""; }

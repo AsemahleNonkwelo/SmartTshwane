@@ -1,0 +1,1 @@
+using Microsoft.AspNetCore.Mvc;namespace SmartTshwane.Controllers;public class HomeController:Controller{public IActionResult Index()=>View();public IActionResult Error()=>View();}

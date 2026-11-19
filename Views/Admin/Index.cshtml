@@ -1,0 +1,43 @@
+@model List<ServiceRequest>
+@{
+    ViewData["Title"] = "Administration dashboard";
+    var total = Model.Count;
+}
+<section class="admin-intro">
+  <div><p class="eyebrow">MUNICIPAL SERVICE MANAGEMENT</p><h1>Administration dashboard</h1><p>Review incoming reports, monitor progress and keep residents informed.</p></div>
+  <a class="button admin-manage" asp-controller="Admin" asp-action="Manage">Manage departments &amp; users →</a>
+</section>
+<div class="admin-stats">
+  <div class="admin-stat"><span>Total reports</span><strong>@total</strong><small>All submissions</small></div>
+  <div class="admin-stat"><span>Pending</span><strong>@ViewBag.Pending</strong><small>Awaiting review</small></div>
+  <div class="admin-stat"><span>In progress</span><strong>@ViewBag.InProgress</strong><small>Being addressed</small></div>
+  <div class="admin-stat"><span>Resolved</span><strong>@ViewBag.Resolved</strong><small>Completed</small></div>
+  <div class="admin-stat"><span>Rejected</span><strong>@ViewBag.Rejected</strong><small>Not approved</small></div>
+</div>
+<section class="admin-panel">
+  <div class="admin-panel-heading"><div><h2>Service reports</h2><p>Update each request and add a message for the resident.</p></div><span class="admin-count">@total reports</span></div>
+  <div class="admin-filters"><input id="reportSearch" type="search" placeholder="Search by reference, title, location or category" aria-label="Search reports"/><select id="statusFilter" aria-label="Filter by status"><option value="">All statuses</option><option>Pending</option><option>In Progress</option><option>Resolved</option><option>Rejected</option></select></div>
+  <p id="emptyFilter" class="admin-empty" hidden>No reports match your search.</p>
+  @if(!Model.Any()){<div class="admin-empty">No service reports yet. New citizen reports will appear here.</div>}
+  @foreach(var r in Model){
+    var tone = r.Status == "Resolved" ? "resolved" : r.Status == "In Progress" ? "progress" : r.Status == "Rejected" ? "rejected" : "pending";
+    <article class="admin-report" data-search="@($"TSH-{r.Id} {r.Title} {r.Location} {r.Category?.Name} {r.User?.FullName}".ToLowerInvariant())" data-status="@r.Status">
+      <div class="admin-report-head"><div><span class="admin-ref">#TSH-@r.Id</span><h3>@r.Title</h3></div><span class="admin-status @tone">@r.Status</span></div>
+      <div class="admin-meta"><span>📍 @r.Location</span><span>🏷 @(r.Category?.Name ?? "Uncategorised")</span><span>👤 @(r.User?.FullName ?? "Citizen")</span><span>📅 @r.CreatedUtc.ToString("dd MMM yyyy")</span></div>
+      <p class="admin-description">@r.Description</p>
+      <details class="admin-edit"><summary>Update status &amp; resident message <span aria-hidden="true">⌄</span></summary>
+        <form method="post" asp-controller="Admin" asp-action="Update">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@r.Id"/>
+          <div class="admin-form-grid"><div><label for="status-@r.Id">Report status</label><select id="status-@r.Id" name="status">@foreach(var st in new[]{"Pending","In Progress","Resolved","Rejected"}){if(r.Status==st){<option value="@st" selected>@st</option>}else{<option value="@st">@st</option>}}</select></div><div><label for="note-@r.Id">Update for the resident</label><textarea id="note-@r.Id" name="note" rows="2" maxlength="500" placeholder="Explain the latest progress...">@r.AdminNote</textarea></div></div>
+          <button type="submit" class="button">Save report update</button>
+        </form>
+      </details>
+    </article>
+  }
+</section>
+<script>
+(function(){
+ const search=document.getElementById('reportSearch'),filter=document.getElementById('statusFilter'),rows=[...document.querySelectorAll('.admin-report')],empty=document.getElementById('emptyFilter');
+ function apply(){const term=search.value.trim().toLowerCase(),status=filter.value;let count=0;rows.forEach(r=>{const show=(!term||r.dataset.search.includes(term))&&(!status||r.dataset.status===status);r.hidden=!show;if(show)count++;});empty.hidden=count>0||rows.length===0;}
+ search.addEventListener('input',apply);filter.addEventListener('change',apply);
+})();
+</script>

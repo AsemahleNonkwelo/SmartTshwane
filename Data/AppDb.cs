@@ -1,0 +1,3 @@
+using Microsoft.EntityFrameworkCore;using SmartTshwane.Models;
+namespace SmartTshwane.Data;
+public class AppDb(DbContextOptions<AppDb> options):DbContext(options){public DbSet<Department> Departments=>Set<Department>();public DbSet<Notification> Notifications=>Set<Notification>();public DbSet<User> Users=>Set<User>();public DbSet<Category> Categories=>Set<Category>();public DbSet<ServiceRequest> Requests=>Set<ServiceRequest>();protected override void OnModelCreating(ModelBuilder b){b.Entity<User>().HasIndex(u=>u.Email).IsUnique();b.Entity<ServiceRequest>().HasOne(r=>r.User).WithMany(u=>u.Requests).HasForeignKey(r=>r.UserId);}}

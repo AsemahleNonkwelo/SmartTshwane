@@ -1,0 +1,14 @@
+# IDE/build artifacts
+.vs/
+bin/
+obj/
+*.user
+*.suo
+# Local data and secrets
+*.db
+*.db-shm
+*.db-wal
+appsettings.Development.json
+.env
+.env.*
+# User secrets are stored outside this project

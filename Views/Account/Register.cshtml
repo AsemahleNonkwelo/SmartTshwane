@@ -1,0 +1,2 @@
+@model RegisterInput
+<div class="card narrow"><h1>Create an account</h1><form method="post" asp-action="Register"><div asp-validation-summary="All" class="error"></div><label asp-for="FullName"></label><input asp-for="FullName"/><label asp-for="PhoneNumber">Phone number</label><input asp-for="PhoneNumber" type="tel"/><label asp-for="Email"></label><input asp-for="Email"/><label asp-for="Password"></label><input asp-for="Password" type="password"/><button class="button">Register</button></form></div>
