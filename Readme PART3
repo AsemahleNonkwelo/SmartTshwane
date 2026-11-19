@@ -1,0 +1,75 @@
+## Part 3: Application Setup and Technologies Used
+
+### 1. Technologies Used
+
+The SmartTshwane application was developed using the following technologies:
+
+- **C#** – Main programming language for the backend and desktop application.
+- **ASP.NET Core MVC (.NET 8)** – Used to develop the web application and manage application functionality.
+- **Razor Views** – Used to create the web application's user interface.
+- **Entity Framework Core** – Used for database operations and data management.
+- **SQLite** – Local database option for storing application data.
+- **PostgreSQL (Supabase)** – Cloud database option for storing and managing service requests.
+- **Java / Android Studio** – Used for the Android mobile application.
+- **Gradle** – Used for Android project building and dependency management.
+- **Visual Studio 2022** – Used for backend and desktop application development.
+- **GitHub** – Used for source code storage and version control.
+
+### 2. Requirements
+
+Before running the application, ensure that you have:
+
+- Visual Studio 2022 installed.
+- ASP.NET and Web Development workload installed.
+- .NET 8 SDK installed.
+- Android Studio installed (if running the Android application).
+- An active internet connection for initial package restoration and Supabase cloud access.
+
+### 3. How to Run the Application
+
+**Backend / Web Application**
+
+1. Download or clone the SmartTshwane repository from GitHub.
+2. Open the `Backend` folder.
+3. Open `SmartTshwane.sln` using Visual Studio 2022.
+4. Allow NuGet packages to restore.
+5. Build the solution by selecting **Build → Build Solution**.
+6. Ensure the application is configured to use SQLite for local testing.
+7. Press **F5** or **Ctrl + F5** to run the application.
+8. Register a new citizen account and log in.
+9. Submit a service request and view its progress under My Reports.
+
+**Android Application**
+
+1. Open Android Studio.
+2. Select **Open** and choose the `Android` project folder.
+3. Allow Gradle to synchronise and download the required dependencies.
+4. Connect an Android device or start an emulator.
+5. Select the application configuration and click **Run**.
+
+**Desktop Application**
+
+1. Open Visual Studio 2022.
+2. Open `SmartTshwane.Desktop.csproj` inside `SmartTshwane_Desktop/Desktop`.
+3. Restore the required packages.
+4. Build and run the project.
+
+### 4. Database Configuration
+
+SmartTshwane supports two database options:
+
+- **SQLite:** Used for local development and testing without requiring a cloud database.
+- **Supabase PostgreSQL:** Used for cloud-based database integration and demonstration.
+
+### 5. Main Application Features
+
+- Citizen registration and login.
+- Municipal service request submission.
+- Viewing and tracking submitted reports.
+- Administrator dashboard.
+- Updating request statuses and administrative notes.
+- Department and category management.
+- User role management.
+- In-app notifications.
+
+**Note:** SmartTshwane is an academic demonstration project developed for Work Integrated Learning Task 2. It is not an officially deployed City of Tshwane municipal service.
